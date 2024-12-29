@@ -1,0 +1,37 @@
+port: 7880
+rtc:
+  tcp_port: 7881
+  udp_port: 7882
+  use_external_ip: false
+  enable_loopback: true
+
+keys:
+  devkey: secret
+
+logging:
+  json: false
+  level: info
+
+redis:
+  address: ""
+  username: ""
+  password: ""
+  db: 0
+
+turn:
+  enabled: true
+  domain: ""
+  cert_file: ""
+  key_file: ""
+  tls_port: 5349
+  udp_port: 3478
+  external_tls: false
+
+ingress:
+  enabled: false
+  rtmp_port: 1935
+  whip_port: 8080
+
+webhook:
+  api_key: ""
+  urls: []

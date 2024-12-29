@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - ./frontend/logs:/app/logs
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_LIVEKIT_URL=ws://localhost:7880
+      - NEXT_PUBLIC_VOICE_ASSISTANT_NAME=AI Assistant
+      - NEXT_PUBLIC_MAX_AUDIO_DURATION_MS=10000
+      - NEXT_PUBLIC_SILENCE_THRESHOLD_DB=-45
+      - NODE_ENV=production
+    command: npm run dev
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+    environment:
+      - LIVEKIT_API_KEY=devkey
+      - LIVEKIT_API_SECRET=secret
+      - WHISPER_MODEL=base
+      - LOG_LEVEL=DEBUG
+      - PYTHONUNBUFFERED=1
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - app-network
+
+  livekit:
+    image: livekit/livekit-server
+    ports:
+      - "7880:7880"
+    environment:
+      - LIVEKIT_KEYS=devkey:secret
+    volumes:
+      - ./config/livekit.yaml:/config.yaml
+
+networks:
+  app-network:
+    driver: bridge
